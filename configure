@@ -1,12 +1,12 @@
 -Dplatforms=x11,wayland
 -Ddri3=true
--Ddri-drivers=i915,i965,nouveau,r100,r200
--Dgallium-drivers=radeonsi,r600,nouveau,svga,swrast,iris
+-Ddri-drivers=i915,i965,nouveau
+-Dgallium-drivers=nouveau,svga,swrast,iris
 -Dcpp_std=gnu++14
 -Dgallium-va=true
 -Dgallium-xa=true
 -Dgallium-opencl=icd
--Dvulkan-drivers=intel,amd
+-Dvulkan-drivers=intel
 -Dshared-glapi=true
 -Dgles2=true
 -Dgbm=true
@@ -16,8 +16,8 @@
 -Dglvnd=false
 -Dasm=true
 -Dosmesa=classic
--Dllvm=true
--Dshared-llvm=true
+-Dllvm=enabled
+-Dshared-llvm=enabled
 -Dselinux=false
 -Dosmesa=gallium
 -Dgallium-xvmc=true

@@ -2,3 +2,22 @@
 # This file contains banned pkgconfig build requirements that get picked up but are 
 # undesireable desirable. One name per line, no whitespace.
 #
+llvm-dev32
+llvm
+llvm-dev
+llvm-lib
+llvm-bin
+llvm-data
+llvm-dev32
+llvm-dev
+llvm-extras
+llvm-extras-libclang
+llvm-extras-libclang-cpp
+llvm-extras-libllvmtablegen
+llvm-extras-libllvm
+llvm-lib32
+llvm-libexec
+llvm-license
+llvm-man
+llvm-staticdev32
+llvm-staticdev

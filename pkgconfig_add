@@ -2,13 +2,13 @@
 # This file contains extra pkgconfig build requirements that don't get picked up but are 
 # desirable. One name per line, no whitespace.
 #
-xfixes
-xshmfence
-xdamage
-32xfixes
-32xshmfence
-32xdamage
-32xext
+#32xfixes
+#32xshmfence
+#32xdamage
+#32xext
+#32dri3proto
 dri3proto
 presentproto
-32dri3proto
+xdamage
+xfixes
+xshmfence
