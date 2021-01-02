@@ -19,6 +19,7 @@ BuildRequires : Vulkan-Headers-dev
 BuildRequires : Vulkan-Loader-dev
 BuildRequires : Vulkan-Tools
 BuildRequires : Z3-dev
+BuildRequires : Z3-staticdev
 BuildRequires : binutils-dev
 BuildRequires : bison
 BuildRequires : buildreq-cmake
@@ -59,6 +60,7 @@ BuildRequires : pkgconfig(32libdrm_intel)
 BuildRequires : pkgconfig(32xvmc)
 BuildRequires : pkgconfig(dri3proto)
 BuildRequires : pkgconfig(libdrm_intel)
+BuildRequires : pkgconfig(libunwind)
 BuildRequires : pkgconfig(presentproto)
 BuildRequires : pkgconfig(valgrind)
 BuildRequires : pkgconfig(xdamage)
@@ -122,9 +124,6 @@ cd %{_builddir}/mesa-mesa-20.3.1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-pushd ..
-cp -a mesa-mesa-20.3.1 buildavx2
-popd
 
 %build
 unset http_proxy
@@ -132,7 +131,7 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1609497984
+export SOURCE_DATE_EPOCH=1609554186
 unset LD_AS_NEEDED
 export GCC_IGNORE_WERROR=1
 ## altflags1 content
@@ -164,13 +163,13 @@ export CCACHE_BASEDIR=/builddir/build/BUILD
 ## altflags1 end
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both -Dplatforms=x11,wayland \
 -Ddri3=true \
--Ddri-drivers=i915,i965,nouveau \
--Dgallium-drivers=nouveau,svga,swrast,iris \
+-Ddri-drivers=i915,i965,nouveau,r100,r200 \
+-Dgallium-drivers=radeonsi,r600,nouveau,svga,swrast,iris \
 -Dcpp_std=gnu++14 \
 -Dgallium-va=true \
 -Dgallium-xa=true \
 -Dgallium-opencl=icd \
--Dvulkan-drivers=intel \
+-Dvulkan-drivers=intel,amd \
 -Dshared-glapi=true \
 -Dgles2=true \
 -Dgbm=true \
@@ -181,52 +180,25 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --
 -Dasm=true \
 -Dosmesa=classic \
 -Dllvm=enabled \
--Dshared-llvm=enabled \
+-Dshared-llvm=disabled \
 -Dselinux=false \
 -Dosmesa=gallium \
 -Dgallium-xvmc=true \
 -Db_ndebug=true \
 -Dprefer-iris=true  builddir
 ninja -v -C builddir
-CFLAGS="$CFLAGS -m64 -march=native -mtune=native" CXXFLAGS="$CXXFLAGS -m64 -march=native -mtune=native " LDFLAGS="$LDFLAGS -m64 -march=native -mtune=native" meson --libdir=lib64/haswell --prefix=/usr --buildtype=plain -Ddefault_library=both -Dplatforms=x11,wayland \
--Ddri3=true \
--Ddri-drivers=i915,i965,nouveau \
--Dgallium-drivers=nouveau,svga,swrast,iris \
--Dcpp_std=gnu++14 \
--Dgallium-va=true \
--Dgallium-xa=true \
--Dgallium-opencl=icd \
--Dvulkan-drivers=intel \
--Dshared-glapi=true \
--Dgles2=true \
--Dgbm=true \
--Dopengl=true \
--Dglx=dri \
--Degl=true \
--Dglvnd=false \
--Dasm=true \
--Dosmesa=classic \
--Dllvm=enabled \
--Dshared-llvm=enabled \
--Dselinux=false \
--Dosmesa=gallium \
--Dgallium-xvmc=true \
--Db_ndebug=true \
--Dprefer-iris=true  builddiravx2
-ninja -v -C builddiravx2
 
 %install
-DESTDIR=%{buildroot} ninja -C builddiravx2 install
 DESTDIR=%{buildroot} ninja -C builddir install
 ## install_append content
-mv %{buildroot}/usr/lib64/haswell/dri/i965_dri.so %{buildroot}/usr/lib64/dri/i965_dri.so.avx2
-mv %{buildroot}/usr/lib64/haswell/dri/swrast_dri.so %{buildroot}/usr/lib64/dri/swrast_dri.so.avx2
+#mv %{buildroot}/usr/lib64/haswell/dri/i965_dri.so %{buildroot}/usr/lib64/dri/i965_dri.so.avx2
+#mv %{buildroot}/usr/lib64/haswell/dri/swrast_dri.so %{buildroot}/usr/lib64/dri/swrast_dri.so.avx2
 #mv %{buildroot}/usr/lib64/haswell/dri/iris_dri.so %{buildroot}/usr/lib64/dri/iris_dri.so.avx2
 #ln -s i965_dri.so %{buildroot}/usr/lib64/dri/i915_dri.so
 
-rm -rf  %{buildroot}/usr/lib64/haswell
+#rm -rf  %{buildroot}/usr/lib64/haswell
 
-sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/intel_icd.i686.json
+#sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/intel_icd.i686.json
 #sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.i686.json
 ## install_append end
 
@@ -236,8 +208,8 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 %files data
 %defattr(-,root,root,-)
 /usr/share/drirc.d/00-mesa-defaults.conf
-/usr/share/vulkan/icd.d/intel_icd.i686.json
 /usr/share/vulkan/icd.d/intel_icd.x86_64.json
+/usr/share/vulkan/icd.d/radeon_icd.x86_64.json
 
 %files dev
 %defattr(-,root,root,-)
@@ -284,17 +256,23 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 %defattr(-,root,root,-)
 /usr/lib64/dri/i915_dri.so
 /usr/lib64/dri/i965_dri.so
-/usr/lib64/dri/i965_dri.so.avx2
 /usr/lib64/dri/iris_dri.so
 /usr/lib64/dri/kms_swrast_dri.so
 /usr/lib64/dri/nouveau_dri.so
 /usr/lib64/dri/nouveau_drv_video.so
 /usr/lib64/dri/nouveau_vieux_dri.so
+/usr/lib64/dri/r200_dri.so
+/usr/lib64/dri/r600_dri.so
+/usr/lib64/dri/r600_drv_video.so
+/usr/lib64/dri/radeon_dri.so
+/usr/lib64/dri/radeonsi_dri.so
+/usr/lib64/dri/radeonsi_drv_video.so
 /usr/lib64/dri/swrast_dri.so
-/usr/lib64/dri/swrast_dri.so.avx2
 /usr/lib64/dri/vmwgfx_dri.so
 /usr/lib64/gallium-pipe/pipe_iris.so
 /usr/lib64/gallium-pipe/pipe_nouveau.so
+/usr/lib64/gallium-pipe/pipe_r600.so
+/usr/lib64/gallium-pipe/pipe_radeonsi.so
 /usr/lib64/gallium-pipe/pipe_swrast.so
 /usr/lib64/gallium-pipe/pipe_vmwgfx.so
 /usr/lib64/libEGL.so
@@ -319,6 +297,10 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 /usr/lib64/libXvMCnouveau.so.1
 /usr/lib64/libXvMCnouveau.so.1.0
 /usr/lib64/libXvMCnouveau.so.1.0.0
+/usr/lib64/libXvMCr600.so
+/usr/lib64/libXvMCr600.so.1
+/usr/lib64/libXvMCr600.so.1.0
+/usr/lib64/libXvMCr600.so.1.0.0
 /usr/lib64/libgbm.so
 /usr/lib64/libgbm.so.1
 /usr/lib64/libgbm.so.1.0.0
@@ -326,6 +308,7 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 /usr/lib64/libglapi.so.0
 /usr/lib64/libglapi.so.0.0.0
 /usr/lib64/libvulkan_intel.so
+/usr/lib64/libvulkan_radeon.so
 /usr/lib64/libxatracker.so
 /usr/lib64/libxatracker.so.2
 /usr/lib64/libxatracker.so.2.5.0
@@ -333,3 +316,11 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 /usr/lib64/vdpau/libvdpau_nouveau.so.1
 /usr/lib64/vdpau/libvdpau_nouveau.so.1.0
 /usr/lib64/vdpau/libvdpau_nouveau.so.1.0.0
+/usr/lib64/vdpau/libvdpau_r600.so
+/usr/lib64/vdpau/libvdpau_r600.so.1
+/usr/lib64/vdpau/libvdpau_r600.so.1.0
+/usr/lib64/vdpau/libvdpau_r600.so.1.0.0
+/usr/lib64/vdpau/libvdpau_radeonsi.so
+/usr/lib64/vdpau/libvdpau_radeonsi.so.1
+/usr/lib64/vdpau/libvdpau_radeonsi.so.1.0
+/usr/lib64/vdpau/libvdpau_radeonsi.so.1.0.0
