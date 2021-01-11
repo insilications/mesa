@@ -1,10 +1,3 @@
-20.3.1
+20.3.2
 libva-dev
 libvdpau-dev
-pkgconfig(32libdrm_intel)
-pkgconfig(32xvmc)
-pkgconfig(libdrm_intel)
-pkgconfig(libunwind)
-pkgconfig(valgrind)
-pkgconfig(xvmc)
-valgrind

@@ -4,10 +4,10 @@
 #
 %define keepstatic 1
 Name     : mesa
-Version  : 20.3.1
+Version  : 20.3.2
 Release  : 256
-URL      : https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.3.1/mesa-mesa-20.3.1.tar.gz
-Source0  : https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.3.1/mesa-mesa-20.3.1.tar.gz
+URL      : https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.3.2/mesa-mesa-20.3.2.tar.gz
+Source0  : https://gitlab.freedesktop.org/mesa/mesa/-/archive/mesa-20.3.2/mesa-mesa-20.3.2.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : GPL-2.0
@@ -17,6 +17,7 @@ BuildRequires : Mako-python
 BuildRequires : Sphinx
 BuildRequires : Vulkan-Headers-dev
 BuildRequires : Vulkan-Loader-dev
+BuildRequires : Vulkan-Loader-dev32
 BuildRequires : Vulkan-Tools
 BuildRequires : Z3-dev
 BuildRequires : Z3-staticdev
@@ -28,13 +29,22 @@ BuildRequires : buildreq-meson
 BuildRequires : buildreq-scons
 BuildRequires : doxygen
 BuildRequires : elfutils-dev
+BuildRequires : elfutils-dev32
 BuildRequires : expat-dev
+BuildRequires : expat-dev32
 BuildRequires : flex
 BuildRequires : gcc-dev
+BuildRequires : gcc-dev32
+BuildRequires : gcc-libgcc32
+BuildRequires : gcc-libstdc++32
 BuildRequires : git
 BuildRequires : glibc-dev
+BuildRequires : glibc-dev32
+BuildRequires : glibc-libc32
 BuildRequires : glibc-staticdev
 BuildRequires : googletest-dev
+BuildRequires : libX11-dev32
+BuildRequires : libXv-dev32
 BuildRequires : libclc-dev
 BuildRequires : libedit
 BuildRequires : libedit-dev
@@ -43,10 +53,17 @@ BuildRequires : libffi-staticdev
 BuildRequires : libgcrypt-dev
 BuildRequires : libpthread-stubs-dev
 BuildRequires : libstdc++-dev
+BuildRequires : libunwind-dev32
 BuildRequires : libva-dev
 BuildRequires : libvdpau-dev
+BuildRequires : libxml2-dev
+BuildRequires : libxml2-dev32
 BuildRequires : libxml2-staticdev
+BuildRequires : libxml2-staticdev32
 BuildRequires : llvm11
+BuildRequires : llvm11-32
+BuildRequires : llvm11-32-dev32
+BuildRequires : llvm11-32-staticdev32
 BuildRequires : llvm11-bin
 BuildRequires : llvm11-data
 BuildRequires : llvm11-dev
@@ -54,9 +71,16 @@ BuildRequires : llvm11-lib
 BuildRequires : llvm11-libexec
 BuildRequires : llvm11-staticdev
 BuildRequires : ncurses-dev
+BuildRequires : ncurses-dev32
 BuildRequires : nettle-dev
+BuildRequires : nettle-dev32
 BuildRequires : ninja
+BuildRequires : pkgconfig(32dri3proto)
 BuildRequires : pkgconfig(32libdrm_intel)
+BuildRequires : pkgconfig(32xdamage)
+BuildRequires : pkgconfig(32xext)
+BuildRequires : pkgconfig(32xfixes)
+BuildRequires : pkgconfig(32xshmfence)
 BuildRequires : pkgconfig(32xvmc)
 BuildRequires : pkgconfig(dri3proto)
 BuildRequires : pkgconfig(libdrm_intel)
@@ -69,15 +93,19 @@ BuildRequires : pkgconfig(xshmfence)
 BuildRequires : pkgconfig(xvmc)
 BuildRequires : python3-dev
 BuildRequires : python3-staticdev
-BuildRequires : valgrind
 BuildRequires : valgrind-dev
 BuildRequires : wayland-dev
+BuildRequires : wayland-dev32
 BuildRequires : wayland-protocols-dev
 BuildRequires : xz-dev
 BuildRequires : xz-staticdev
+BuildRequires : xz-staticdev32
 BuildRequires : zlib-dev
+BuildRequires : zlib-dev32
 BuildRequires : zlib-staticdev
+BuildRequires : zlib-staticdev32
 BuildRequires : zstd-dev
+BuildRequires : zstd-dev32
 # Suppress stripping binaries
 %define __strip /bin/true
 %define debug_package %{nil}
@@ -104,9 +132,23 @@ Requires: mesa-lib = %{version}-%{release}
 Requires: mesa-data = %{version}-%{release}
 Provides: mesa-devel = %{version}-%{release}
 Requires: mesa = %{version}-%{release}
+Requires: mesa-dev = %{version}-%{release}
+Requires: mesa-dev32 = %{version}-%{release}
 
 %description dev
 dev components for the mesa package.
+
+
+%package dev32
+Summary: dev32 components for the mesa package.
+Group: Default
+Requires: mesa-lib32 = %{version}-%{release}
+Requires: mesa-data = %{version}-%{release}
+Requires: mesa-dev = %{version}-%{release}
+Requires: mesa-dev32 = %{version}-%{release}
+
+%description dev32
+dev32 components for the mesa package.
 
 
 %package lib
@@ -118,12 +160,24 @@ Requires: mesa-data = %{version}-%{release}
 lib components for the mesa package.
 
 
+%package lib32
+Summary: lib32 components for the mesa package.
+Group: Default
+Requires: mesa-data = %{version}-%{release}
+
+%description lib32
+lib32 components for the mesa package.
+
+
 %prep
-%setup -q -n mesa-mesa-20.3.1
-cd %{_builddir}/mesa-mesa-20.3.1
+%setup -q -n mesa-mesa-20.3.2
+cd %{_builddir}/mesa-mesa-20.3.2
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+pushd ..
+cp -a mesa-mesa-20.3.2 build32
+popd
 
 %build
 unset http_proxy
@@ -131,7 +185,7 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1609554186
+export SOURCE_DATE_EPOCH=1610333762
 unset LD_AS_NEEDED
 export GCC_IGNORE_WERROR=1
 ## altflags1 content
@@ -187,8 +241,58 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --
 -Db_ndebug=true \
 -Dprefer-iris=true  builddir
 ninja -v -C builddir
+pushd ../build32/
+export CFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -pipe"
+export CXXFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -fvisibility-inlines-hidden -pipe"
+export LDFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -pipe"
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+unset LD_LIBRARY_PATH
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
+export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
+export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
+export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32 -mstackrealign"
+meson --libdir=lib32 --prefix=/usr --buildtype=plain -Ddefault_library=both -Dplatforms=x11,wayland \
+-Ddri3=true \
+-Ddri-drivers=i915,i965,nouveau,r100,r200 \
+-Dgallium-drivers=radeonsi,r600,nouveau,svga,swrast,iris \
+-Dcpp_std=gnu++14 \
+-Dgallium-va=true \
+-Dgallium-xa=true \
+-Dgallium-opencl=icd \
+-Dvulkan-drivers=intel,amd \
+-Dshared-glapi=true \
+-Dgles2=true \
+-Dgbm=true \
+-Dopengl=true \
+-Dglx=dri \
+-Degl=true \
+-Dglvnd=false \
+-Dasm=true \
+-Dosmesa=classic \
+-Dllvm=enabled \
+-Dshared-llvm=disabled \
+-Dselinux=false \
+-Dosmesa=gallium \
+-Dgallium-xvmc=true \
+-Db_ndebug=true \
+-Dprefer-iris=true -Dasm=false \
+-Dgallium-opencl=disabled builddir
+ninja -v -C builddir
+popd
 
 %install
+pushd ../build32/
+DESTDIR=%{buildroot} ninja -C builddir install
+if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
+then
+pushd %{buildroot}/usr/lib32/pkgconfig
+for i in *.pc ; do ln -s $i 32$i ; done
+popd
+fi
+popd
 DESTDIR=%{buildroot} ninja -C builddir install
 ## install_append content
 #mv %{buildroot}/usr/lib64/haswell/dri/i965_dri.so %{buildroot}/usr/lib64/dri/i965_dri.so.avx2
@@ -251,6 +355,25 @@ DESTDIR=%{buildroot} ninja -C builddir install
 /usr/lib64/pkgconfig/glesv2.pc
 /usr/lib64/pkgconfig/osmesa.pc
 /usr/lib64/pkgconfig/xatracker.pc
+
+%files dev32
+%defattr(-,root,root,-)
+/usr/lib32/pkgconfig/32dri.pc
+/usr/lib32/pkgconfig/32egl.pc
+/usr/lib32/pkgconfig/32gbm.pc
+/usr/lib32/pkgconfig/32gl.pc
+/usr/lib32/pkgconfig/32glesv1_cm.pc
+/usr/lib32/pkgconfig/32glesv2.pc
+/usr/lib32/pkgconfig/32osmesa.pc
+/usr/lib32/pkgconfig/32xatracker.pc
+/usr/lib32/pkgconfig/dri.pc
+/usr/lib32/pkgconfig/egl.pc
+/usr/lib32/pkgconfig/gbm.pc
+/usr/lib32/pkgconfig/gl.pc
+/usr/lib32/pkgconfig/glesv1_cm.pc
+/usr/lib32/pkgconfig/glesv2.pc
+/usr/lib32/pkgconfig/osmesa.pc
+/usr/lib32/pkgconfig/xatracker.pc
 
 %files lib
 %defattr(-,root,root,-)
@@ -324,3 +447,67 @@ DESTDIR=%{buildroot} ninja -C builddir install
 /usr/lib64/vdpau/libvdpau_radeonsi.so.1
 /usr/lib64/vdpau/libvdpau_radeonsi.so.1.0
 /usr/lib64/vdpau/libvdpau_radeonsi.so.1.0.0
+
+%files lib32
+%defattr(-,root,root,-)
+/usr/lib32/dri/i915_dri.so
+/usr/lib32/dri/i965_dri.so
+/usr/lib32/dri/iris_dri.so
+/usr/lib32/dri/kms_swrast_dri.so
+/usr/lib32/dri/nouveau_dri.so
+/usr/lib32/dri/nouveau_drv_video.so
+/usr/lib32/dri/nouveau_vieux_dri.so
+/usr/lib32/dri/r200_dri.so
+/usr/lib32/dri/r600_dri.so
+/usr/lib32/dri/r600_drv_video.so
+/usr/lib32/dri/radeon_dri.so
+/usr/lib32/dri/radeonsi_dri.so
+/usr/lib32/dri/radeonsi_drv_video.so
+/usr/lib32/dri/swrast_dri.so
+/usr/lib32/dri/vmwgfx_dri.so
+/usr/lib32/libEGL.so
+/usr/lib32/libEGL.so.1
+/usr/lib32/libEGL.so.1.0.0
+/usr/lib32/libGL.so
+/usr/lib32/libGL.so.1
+/usr/lib32/libGL.so.1.2.0
+/usr/lib32/libGLESv1_CM.so
+/usr/lib32/libGLESv1_CM.so.1
+/usr/lib32/libGLESv1_CM.so.1.1.0
+/usr/lib32/libGLESv2.so
+/usr/lib32/libGLESv2.so.2
+/usr/lib32/libGLESv2.so.2.0.0
+/usr/lib32/libOSMesa.so
+/usr/lib32/libOSMesa.so.8
+/usr/lib32/libOSMesa.so.8.0.0
+/usr/lib32/libXvMCnouveau.so
+/usr/lib32/libXvMCnouveau.so.1
+/usr/lib32/libXvMCnouveau.so.1.0
+/usr/lib32/libXvMCnouveau.so.1.0.0
+/usr/lib32/libXvMCr600.so
+/usr/lib32/libXvMCr600.so.1
+/usr/lib32/libXvMCr600.so.1.0
+/usr/lib32/libXvMCr600.so.1.0.0
+/usr/lib32/libgbm.so
+/usr/lib32/libgbm.so.1
+/usr/lib32/libgbm.so.1.0.0
+/usr/lib32/libglapi.so
+/usr/lib32/libglapi.so.0
+/usr/lib32/libglapi.so.0.0.0
+/usr/lib32/libvulkan_intel.so
+/usr/lib32/libvulkan_radeon.so
+/usr/lib32/libxatracker.so
+/usr/lib32/libxatracker.so.2
+/usr/lib32/libxatracker.so.2.5.0
+/usr/lib32/vdpau/libvdpau_nouveau.so
+/usr/lib32/vdpau/libvdpau_nouveau.so.1
+/usr/lib32/vdpau/libvdpau_nouveau.so.1.0
+/usr/lib32/vdpau/libvdpau_nouveau.so.1.0.0
+/usr/lib32/vdpau/libvdpau_r600.so
+/usr/lib32/vdpau/libvdpau_r600.so.1
+/usr/lib32/vdpau/libvdpau_r600.so.1.0
+/usr/lib32/vdpau/libvdpau_r600.so.1.0.0
+/usr/lib32/vdpau/libvdpau_radeonsi.so
+/usr/lib32/vdpau/libvdpau_radeonsi.so.1
+/usr/lib32/vdpau/libvdpau_radeonsi.so.1.0
+/usr/lib32/vdpau/libvdpau_radeonsi.so.1.0.0

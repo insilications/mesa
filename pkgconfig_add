@@ -2,14 +2,19 @@
 # This file contains extra pkgconfig build requirements that don't get picked up but are 
 # desirable. One name per line, no whitespace.
 #
-#32xfixes
-#32xshmfence
-#32xdamage
-#32xext
-#32dri3proto
+32dri3proto
+32libdrm_intel
+32xdamage
+32xext
+32xfixes
+32xshmfence
+32xvmc
 dri3proto
+libdrm_intel
+libunwind
 presentproto
+valgrind
 xdamage
 xfixes
 xshmfence
-libunwind
+xvmc
