@@ -1,0 +1,9 @@
+12.00
+pkgconfig(32libomxil-bellagio)
+pkgconfig(32libtizonia)
+pkgconfig(32libtizplatform)
+pkgconfig(32tizilheaders)
+pkgconfig(libomxil-bellagio)
+pkgconfig(libtizonia)
+pkgconfig(libtizplatform)
+pkgconfig(tizilheaders)

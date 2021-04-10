@@ -11,6 +11,8 @@ Source0  : file:///aot/build/clearlinux/packages/mesa/mesa-skl-fast-clear-v12.00
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : GPL-2.0
+Requires: mesa-data = %{version}-%{release}
+Requires: mesa-lib = %{version}-%{release}
 BuildRequires : Mako-python
 BuildRequires : Sphinx
 BuildRequires : Vulkan-Headers-dev
@@ -18,6 +20,7 @@ BuildRequires : Vulkan-Loader-dev
 BuildRequires : Vulkan-Loader-dev32
 BuildRequires : Vulkan-Tools
 BuildRequires : Z3-dev
+BuildRequires : Z3-dev32
 BuildRequires : Z3-staticdev
 BuildRequires : binutils-dev
 BuildRequires : bison
@@ -116,6 +119,55 @@ Patch3: 0001-Revert-egl-move-include-of-local-headers-out-of-Khro.patch
 A Vulkan layer to display information about the running application
 using an overlay.
 
+%package data
+Summary: data components for the mesa package.
+Group: Data
+
+%description data
+data components for the mesa package.
+
+
+%package dev
+Summary: dev components for the mesa package.
+Group: Development
+Requires: mesa-lib = %{version}-%{release}
+Requires: mesa-data = %{version}-%{release}
+Provides: mesa-devel = %{version}-%{release}
+Requires: mesa = %{version}-%{release}
+
+%description dev
+dev components for the mesa package.
+
+
+%package dev32
+Summary: dev32 components for the mesa package.
+Group: Default
+Requires: mesa-lib32 = %{version}-%{release}
+Requires: mesa-data = %{version}-%{release}
+Requires: mesa-dev = %{version}-%{release}
+
+%description dev32
+dev32 components for the mesa package.
+
+
+%package lib
+Summary: lib components for the mesa package.
+Group: Libraries
+Requires: mesa-data = %{version}-%{release}
+
+%description lib
+lib components for the mesa package.
+
+
+%package lib32
+Summary: lib32 components for the mesa package.
+Group: Default
+Requires: mesa-data = %{version}-%{release}
+
+%description lib32
+lib32 components for the mesa package.
+
+
 %prep
 %setup -q -n mesa
 cd %{_builddir}/mesa
@@ -132,25 +184,25 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1618034960
+export SOURCE_DATE_EPOCH=1618038720
 unset LD_AS_NEEDED
 export GCC_IGNORE_WERROR=1
 ## altflags1 content
-export CFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -flto=16 -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
+export CFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
 #
-export CXXFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -flto=16 -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -fvisibility-inlines-hidden -pipe -ffat-lto-objects -fPIC"
+export CXXFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -fvisibility-inlines-hidden -pipe -ffat-lto-objects -fPIC"
 #
-export FCFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -flto=16 -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
-export FFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -flto=16 -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
-export CFFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -flto=16 -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
+export FCFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
+export FFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
+export CFFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
 #
-export LDFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -flto=16 -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
+export LDFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC -lLLVMWindowsManifest -lLLVMXRay -lLLVMLibDriver -lLLVMDlltoolDriver -lLLVMCoverage -lLLVMLineEditor -lLLVMAMDGPUDisassembler -lLLVMAMDGPUAsmParser -lLLVMAMDGPUCodeGen -lLLVMAMDGPUDesc -lLLVMAMDGPUUtils -lLLVMAMDGPUInfo -lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMX86Desc -lLLVMX86Info -lLLVMOrcJIT -lLLVMMCJIT -lLLVMJITLink -lLLVMOrcTargetProcess -lLLVMOrcShared -lLLVMInterpreter -lLLVMExecutionEngine -lLLVMRuntimeDyld -lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoGSYM -lLLVMOption -lLLVMObjectYAML -lLLVMMCA -lLLVMMCDisassembler -lLLVMLTO -lLLVMCFGuard -lLLVMFrontendOpenACC -lLLVMExtensions -lPolly -lPollyISL -lLLVMPasses -lLLVMObjCARCOpts -lLLVMHelloNew -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMLinker -lLLVMFrontendOpenMP -lLLVMDWARFLinker -lLLVMGlobalISel -lLLVMMIRParser -lLLVMAsmPrinter -lLLVMDebugInfoDWARF -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMIRReader -lLLVMAsmParser -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMFuzzMutate -lLLVMTarget -lLLVMScalarOpts -lLLVMInstCombine -lLLVMAggressiveInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMObject -lLLVMTextAPI -lLLVMMCParser -lLLVMMC -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF -lLLVMBitReader -lLLVMCore -lLLVMRemarks -lLLVMBitstreamReader -lLLVMBinaryFormat -lLLVMTableGen -lLLVMSupport -lLLVMDemangle"
 #
 export MAKEFLAGS=%{?_smp_mflags}
 #
 %global _lto_cflags 1
 #
-unset CCACHE_DISABLE
+export CCACHE_DISABLE=true
 export PATH="/usr/lib64/ccache/bin:$PATH"
 export CCACHE_NOHASHDIR=true
 export CCACHE_CPP2=true
@@ -164,8 +216,9 @@ export CCACHE_BASEDIR=/builddir/build/BUILD
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both -Dplatforms=x11,wayland \
 -Dgallium=enabled \
 -Ddri3=true \
--Ddri-drivers=i915,i965,nouveau \
--Dgallium-drivers=nouveau,virgl,swrast \
+-Ddri-drivers=nouveau \
+-Dgallium-drivers=nouveau,i915,virgl,swrast,iris \
+-Dprefer-iris=true \
 -Dcpp_std=gnu++14 \
 -Dgallium-va=true \
 -Dgallium-xa=true \
@@ -175,12 +228,26 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --
 -Dglvnd=false \
 -Dasm=true \
 -Dllvm=true \
--Dshared-llvm=false \
+-Dshared-llvm=disabled \
 -Dselinux=false \
 -Dprefer-iris=true \
 -Dosmesa=true  builddir
-ninja %{?_smp_mflags} -v -C builddir
+ninja --verbose %{?_smp_mflags} -v -C builddir
 pushd ../build32/
+## altflags1_32 content
+unset LD_LIBRARY_PATH
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export CCACHE_DISABLE=true
+export PATH="/usr/lib64/ccache/bin:$PATH"
+export CCACHE_NOHASHDIR=true
+export CCACHE_CPP2=true
+export CCACHE_SLOPPINESS=modules,include_file_mtime,include_file_ctime,time_macros,pch_defines,file_stat_matches,clang_index_store,system_headers,locale
+export CCACHE_DIR=/var/tmp/ccache
+export CCACHE_BASEDIR=/builddir/build/BUILD
+#export CCACHE_LOGFILE=/var/tmp/ccache/cache.debug
+#export CCACHE_DEBUG=true
+#export CCACHE_NODIRECT=true
+#
 export CFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
 export CXXFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -fvisibility-inlines-hidden -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
 export LDFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
@@ -188,16 +255,16 @@ export AR=gcc-ar
 export RANLIB=gcc-ranlib
 export NM=gcc-nm
 unset LD_LIBRARY_PATH
-export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
 export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
-export CFLAGS="${CFLAGS}${CFLAGS:+ }-m32 -mstackrealign"
-export CXXFLAGS="${CXXFLAGS}${CXXFLAGS:+ }-m32 -mstackrealign"
-export LDFLAGS="${LDFLAGS}${LDFLAGS:+ }-m32 -mstackrealign"
+export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
+## altflags1_32 end
 meson --libdir=lib32 --prefix=/usr --buildtype=plain -Ddefault_library=both -Dplatforms=x11,wayland \
 -Dgallium=enabled \
 -Ddri3=true \
--Ddri-drivers=i915,i965,nouveau \
--Dgallium-drivers=nouveau,virgl,swrast \
+-Ddri-drivers=nouveau \
+-Dgallium-drivers=nouveau,i915,virgl,swrast,iris \
+-Dprefer-iris=true \
 -Dcpp_std=gnu++14 \
 -Dgallium-va=true \
 -Dgallium-xa=true \
@@ -207,13 +274,13 @@ meson --libdir=lib32 --prefix=/usr --buildtype=plain -Ddefault_library=both -Dpl
 -Dglvnd=false \
 -Dasm=true \
 -Dllvm=true \
--Dshared-llvm=false \
+-Dshared-llvm=disabled \
 -Dselinux=false \
 -Dprefer-iris=true \
 -Dosmesa=true -Dasm=false \
 -Dgallium-opencl=disabled \
 -Dgallium=enabled builddir
-ninja %{?_smp_mflags} -v -C builddir
+ninja --verbose %{?_smp_mflags} -v -C builddir
 popd
 
 %install
@@ -236,8 +303,169 @@ DESTDIR=%{buildroot} ninja -C builddir install
 #rm -rf  %{buildroot}/usr/lib64/haswell
 
 sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/intel_icd.i686.json
-sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.i686.json
+#sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.i686.json
 ## install_append end
 
 %files
 %defattr(-,root,root,-)
+
+%files data
+%defattr(-,root,root,-)
+/usr/share/drirc.d/00-mesa-defaults.conf
+/usr/share/vulkan/icd.d/intel_icd.i686.json
+/usr/share/vulkan/icd.d/intel_icd.x86_64.json
+
+%files dev
+%defattr(-,root,root,-)
+/usr/include/EGL/egl.h
+/usr/include/EGL/eglext.h
+/usr/include/EGL/eglextchromium.h
+/usr/include/EGL/eglmesaext.h
+/usr/include/EGL/eglplatform.h
+/usr/include/GL/gl.h
+/usr/include/GL/glcorearb.h
+/usr/include/GL/glext.h
+/usr/include/GL/glx.h
+/usr/include/GL/glxext.h
+/usr/include/GL/internal/dri_interface.h
+/usr/include/GL/osmesa.h
+/usr/include/GLES/egl.h
+/usr/include/GLES/gl.h
+/usr/include/GLES/glext.h
+/usr/include/GLES/glplatform.h
+/usr/include/GLES2/gl2.h
+/usr/include/GLES2/gl2ext.h
+/usr/include/GLES2/gl2platform.h
+/usr/include/GLES3/gl3.h
+/usr/include/GLES3/gl31.h
+/usr/include/GLES3/gl32.h
+/usr/include/GLES3/gl3ext.h
+/usr/include/GLES3/gl3platform.h
+/usr/include/KHR/khrplatform.h
+/usr/include/gbm.h
+/usr/include/vulkan/vulkan_intel.h
+/usr/include/xa_composite.h
+/usr/include/xa_context.h
+/usr/include/xa_tracker.h
+/usr/lib64/pkgconfig/dri.pc
+/usr/lib64/pkgconfig/egl.pc
+/usr/lib64/pkgconfig/gbm.pc
+/usr/lib64/pkgconfig/gl.pc
+/usr/lib64/pkgconfig/glesv1_cm.pc
+/usr/lib64/pkgconfig/glesv2.pc
+/usr/lib64/pkgconfig/osmesa.pc
+/usr/lib64/pkgconfig/xatracker.pc
+
+%files dev32
+%defattr(-,root,root,-)
+/usr/lib32/pkgconfig/32dri.pc
+/usr/lib32/pkgconfig/32egl.pc
+/usr/lib32/pkgconfig/32gbm.pc
+/usr/lib32/pkgconfig/32gl.pc
+/usr/lib32/pkgconfig/32glesv1_cm.pc
+/usr/lib32/pkgconfig/32glesv2.pc
+/usr/lib32/pkgconfig/32osmesa.pc
+/usr/lib32/pkgconfig/32xatracker.pc
+/usr/lib32/pkgconfig/dri.pc
+/usr/lib32/pkgconfig/egl.pc
+/usr/lib32/pkgconfig/gbm.pc
+/usr/lib32/pkgconfig/gl.pc
+/usr/lib32/pkgconfig/glesv1_cm.pc
+/usr/lib32/pkgconfig/glesv2.pc
+/usr/lib32/pkgconfig/osmesa.pc
+/usr/lib32/pkgconfig/xatracker.pc
+
+%files lib
+%defattr(-,root,root,-)
+/usr/lib64/dri/i915_dri.so
+/usr/lib64/dri/iris_dri.so
+/usr/lib64/dri/kms_swrast_dri.so
+/usr/lib64/dri/nouveau_dri.so
+/usr/lib64/dri/nouveau_drv_video.so
+/usr/lib64/dri/nouveau_vieux_dri.so
+/usr/lib64/dri/swrast_dri.so
+/usr/lib64/dri/virtio_gpu_dri.so
+/usr/lib64/gallium-pipe/pipe_i915.so
+/usr/lib64/gallium-pipe/pipe_iris.so
+/usr/lib64/gallium-pipe/pipe_nouveau.so
+/usr/lib64/gallium-pipe/pipe_swrast.so
+/usr/lib64/libEGL.so
+/usr/lib64/libEGL.so.1
+/usr/lib64/libEGL.so.1.0.0
+/usr/lib64/libGL.so
+/usr/lib64/libGL.so.1
+/usr/lib64/libGL.so.1.2.0
+/usr/lib64/libGLESv1_CM.so
+/usr/lib64/libGLESv1_CM.so.1
+/usr/lib64/libGLESv1_CM.so.1.1.0
+/usr/lib64/libGLESv2.so
+/usr/lib64/libGLESv2.so.2
+/usr/lib64/libGLESv2.so.2.0.0
+/usr/lib64/libMesaOpenCL.so
+/usr/lib64/libMesaOpenCL.so.1
+/usr/lib64/libMesaOpenCL.so.1.0.0
+/usr/lib64/libOSMesa.so
+/usr/lib64/libOSMesa.so.8
+/usr/lib64/libOSMesa.so.8.0.0
+/usr/lib64/libXvMCnouveau.so
+/usr/lib64/libXvMCnouveau.so.1
+/usr/lib64/libXvMCnouveau.so.1.0
+/usr/lib64/libXvMCnouveau.so.1.0.0
+/usr/lib64/libgbm.so
+/usr/lib64/libgbm.so.1
+/usr/lib64/libgbm.so.1.0.0
+/usr/lib64/libglapi.so
+/usr/lib64/libglapi.so.0
+/usr/lib64/libglapi.so.0.0.0
+/usr/lib64/libvulkan_intel.so
+/usr/lib64/libxatracker.so
+/usr/lib64/libxatracker.so.2
+/usr/lib64/libxatracker.so.2.5.0
+/usr/lib64/vdpau/libvdpau_nouveau.so
+/usr/lib64/vdpau/libvdpau_nouveau.so.1
+/usr/lib64/vdpau/libvdpau_nouveau.so.1.0
+/usr/lib64/vdpau/libvdpau_nouveau.so.1.0.0
+
+%files lib32
+%defattr(-,root,root,-)
+/usr/lib32/dri/i915_dri.so
+/usr/lib32/dri/iris_dri.so
+/usr/lib32/dri/kms_swrast_dri.so
+/usr/lib32/dri/nouveau_dri.so
+/usr/lib32/dri/nouveau_drv_video.so
+/usr/lib32/dri/nouveau_vieux_dri.so
+/usr/lib32/dri/swrast_dri.so
+/usr/lib32/dri/virtio_gpu_dri.so
+/usr/lib32/libEGL.so
+/usr/lib32/libEGL.so.1
+/usr/lib32/libEGL.so.1.0.0
+/usr/lib32/libGL.so
+/usr/lib32/libGL.so.1
+/usr/lib32/libGL.so.1.2.0
+/usr/lib32/libGLESv1_CM.so
+/usr/lib32/libGLESv1_CM.so.1
+/usr/lib32/libGLESv1_CM.so.1.1.0
+/usr/lib32/libGLESv2.so
+/usr/lib32/libGLESv2.so.2
+/usr/lib32/libGLESv2.so.2.0.0
+/usr/lib32/libOSMesa.so
+/usr/lib32/libOSMesa.so.8
+/usr/lib32/libOSMesa.so.8.0.0
+/usr/lib32/libXvMCnouveau.so
+/usr/lib32/libXvMCnouveau.so.1
+/usr/lib32/libXvMCnouveau.so.1.0
+/usr/lib32/libXvMCnouveau.so.1.0.0
+/usr/lib32/libgbm.so
+/usr/lib32/libgbm.so.1
+/usr/lib32/libgbm.so.1.0.0
+/usr/lib32/libglapi.so
+/usr/lib32/libglapi.so.0
+/usr/lib32/libglapi.so.0.0.0
+/usr/lib32/libvulkan_intel.so
+/usr/lib32/libxatracker.so
+/usr/lib32/libxatracker.so.2
+/usr/lib32/libxatracker.so.2.5.0
+/usr/lib32/vdpau/libvdpau_nouveau.so
+/usr/lib32/vdpau/libvdpau_nouveau.so.1
+/usr/lib32/vdpau/libvdpau_nouveau.so.1.0
+/usr/lib32/vdpau/libvdpau_nouveau.so.1.0.0
