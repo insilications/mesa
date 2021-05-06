@@ -34,10 +34,14 @@ BuildRequires : elfutils-dev32
 BuildRequires : expat-dev
 BuildRequires : expat-dev32
 BuildRequires : flex
+BuildRequires : gcc
 BuildRequires : gcc-dev
 BuildRequires : gcc-dev32
 BuildRequires : gcc-libgcc32
+BuildRequires : gcc-libs-math
 BuildRequires : gcc-libstdc++32
+BuildRequires : gcc-libubsan
+BuildRequires : gcc-locale
 BuildRequires : git
 BuildRequires : glibc-dev
 BuildRequires : glibc-dev32
@@ -51,8 +55,10 @@ BuildRequires : libedit
 BuildRequires : libedit-dev
 BuildRequires : libffi-dev
 BuildRequires : libffi-staticdev
+BuildRequires : libgcc1
 BuildRequires : libgcrypt-dev
 BuildRequires : libpthread-stubs-dev
+BuildRequires : libstdc++
 BuildRequires : libstdc++-dev
 BuildRequires : libunwind-dev32
 BuildRequires : libva-dev
@@ -61,34 +67,32 @@ BuildRequires : libxml2-dev
 BuildRequires : libxml2-dev32
 BuildRequires : libxml2-staticdev
 BuildRequires : libxml2-staticdev32
-BuildRequires : llvm12-32-gcc-dev32
-BuildRequires : llvm12-32-gcc-staticdev32
-BuildRequires : llvm12-gcc
-BuildRequires : llvm12-gcc-bin
-BuildRequires : llvm12-gcc-data
-BuildRequires : llvm12-gcc-dev
-BuildRequires : llvm12-gcc-lib
-BuildRequires : llvm12-gcc-libexec
-BuildRequires : llvm12-gcc-man
-BuildRequires : llvm12-gcc-staticdev
+BuildRequires : llvm
+BuildRequires : llvm-abi
+BuildRequires : llvm-bin
+BuildRequires : llvm-data
+BuildRequires : llvm-dev
+BuildRequires : llvm-lib
+BuildRequires : llvm-libexec
+BuildRequires : llvm-man
+BuildRequires : llvm-staticdev
 BuildRequires : ncurses
 BuildRequires : ncurses-dev
 BuildRequires : ncurses-dev32
 BuildRequires : nettle-dev
 BuildRequires : nettle-dev32
 BuildRequires : ninja
+BuildRequires : nvidia
+BuildRequires : nvidia-dev
+BuildRequires : nvidia-dev32
 BuildRequires : pkgconfig(32dri3proto)
-BuildRequires : pkgconfig(32libdrm_intel)
 BuildRequires : pkgconfig(32xdamage)
 BuildRequires : pkgconfig(32xext)
 BuildRequires : pkgconfig(32xfixes)
 BuildRequires : pkgconfig(32xshmfence)
-BuildRequires : pkgconfig(32xvmc)
 BuildRequires : pkgconfig(dri3proto)
 BuildRequires : pkgconfig(libdrm_intel)
-BuildRequires : pkgconfig(libunwind)
 BuildRequires : pkgconfig(presentproto)
-BuildRequires : pkgconfig(valgrind)
 BuildRequires : pkgconfig(xdamage)
 BuildRequires : pkgconfig(xfixes)
 BuildRequires : pkgconfig(xshmfence)
@@ -139,17 +143,6 @@ Requires: mesa = %{version}-%{release}
 dev components for the mesa package.
 
 
-%package dev32
-Summary: dev32 components for the mesa package.
-Group: Default
-Requires: mesa-lib32 = %{version}-%{release}
-Requires: mesa-data = %{version}-%{release}
-Requires: mesa-dev = %{version}-%{release}
-
-%description dev32
-dev32 components for the mesa package.
-
-
 %package lib
 Summary: lib components for the mesa package.
 Group: Libraries
@@ -159,24 +152,12 @@ Requires: mesa-data = %{version}-%{release}
 lib components for the mesa package.
 
 
-%package lib32
-Summary: lib32 components for the mesa package.
-Group: Default
-Requires: mesa-data = %{version}-%{release}
-
-%description lib32
-lib32 components for the mesa package.
-
-
 %prep
 %setup -q -n mesa
 cd %{_builddir}/mesa
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-pushd ..
-cp -a mesa build32
-popd
 
 %build
 unset http_proxy
@@ -184,7 +165,7 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1618038720
+export SOURCE_DATE_EPOCH=1620271487
 unset LD_AS_NEEDED
 export GCC_IGNORE_WERROR=1
 ## altflags1 content
@@ -196,7 +177,7 @@ export FCFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtun
 export FFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
 export CFFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
 #
-export LDFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC -lLLVMWindowsManifest -lLLVMXRay -lLLVMLibDriver -lLLVMDlltoolDriver -lLLVMCoverage -lLLVMLineEditor -lLLVMAMDGPUDisassembler -lLLVMAMDGPUAsmParser -lLLVMAMDGPUCodeGen -lLLVMAMDGPUDesc -lLLVMAMDGPUUtils -lLLVMAMDGPUInfo -lLLVMX86Disassembler -lLLVMX86AsmParser -lLLVMX86CodeGen -lLLVMX86Desc -lLLVMX86Info -lLLVMOrcJIT -lLLVMMCJIT -lLLVMJITLink -lLLVMOrcTargetProcess -lLLVMOrcShared -lLLVMInterpreter -lLLVMExecutionEngine -lLLVMRuntimeDyld -lLLVMSymbolize -lLLVMDebugInfoPDB -lLLVMDebugInfoGSYM -lLLVMOption -lLLVMObjectYAML -lLLVMMCA -lLLVMMCDisassembler -lLLVMLTO -lLLVMCFGuard -lLLVMFrontendOpenACC -lLLVMExtensions -lPolly -lPollyISL -lLLVMPasses -lLLVMObjCARCOpts -lLLVMHelloNew -lLLVMCoroutines -lLLVMipo -lLLVMInstrumentation -lLLVMVectorize -lLLVMLinker -lLLVMFrontendOpenMP -lLLVMDWARFLinker -lLLVMGlobalISel -lLLVMMIRParser -lLLVMAsmPrinter -lLLVMDebugInfoDWARF -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMIRReader -lLLVMAsmParser -lLLVMInterfaceStub -lLLVMFileCheck -lLLVMFuzzMutate -lLLVMTarget -lLLVMScalarOpts -lLLVMInstCombine -lLLVMAggressiveInstCombine -lLLVMTransformUtils -lLLVMBitWriter -lLLVMAnalysis -lLLVMProfileData -lLLVMObject -lLLVMTextAPI -lLLVMMCParser -lLLVMMC -lLLVMDebugInfoCodeView -lLLVMDebugInfoMSF -lLLVMBitReader -lLLVMCore -lLLVMRemarks -lLLVMBitstreamReader -lLLVMBinaryFormat -lLLVMTableGen -lLLVMSupport -lLLVMDemangle"
+export LDFLAGS="-O3 --param=lto-max-streaming-parallelism=16 -march=native -mtune=native -Wall -Wl,--as-needed -Wl,--build-id=sha1 -Wl,--enable-new-dtags -Wl,--hash-style=gnu -Wl,-O2 -Wl,-z,now -Wl,-z,relro -falign-functions=32 -flimit-function-alignment -fasynchronous-unwind-tables -fdevirtualize-at-ltrans -floop-nest-optimize -fno-math-errno -fno-semantic-interposition -fno-stack-protector -fno-trapping-math -ftree-loop-distribute-patterns -ftree-loop-vectorize -ftree-vectorize -funroll-loops -fuse-ld=bfd -fuse-linker-plugin -malign-data=cacheline -feliminate-unused-debug-types -fno-lto -mtls-dialect=gnu2 -Wl,-sort-common -Wno-error -Wp,-D_REENTRANT -pipe -ffat-lto-objects -fPIC"
 #
 export MAKEFLAGS=%{?_smp_mflags}
 #
@@ -214,7 +195,6 @@ export CCACHE_BASEDIR=/builddir/build/BUILD
 #export CCACHE_NODIRECT=true
 ## altflags1 end
 CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both -Dplatforms=x11,wayland \
--Dgallium=enabled \
 -Ddri3=true \
 -Ddri-drivers=nouveau \
 -Dgallium-drivers=nouveau,i915,virgl,swrast,iris \
@@ -233,66 +213,8 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --
 -Dprefer-iris=true \
 -Dosmesa=true  builddir
 ninja --verbose %{?_smp_mflags} -v -C builddir
-pushd ../build32/
-## altflags1_32 content
-unset LD_LIBRARY_PATH
-export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
-export CCACHE_DISABLE=true
-export PATH="/usr/lib64/ccache/bin:$PATH"
-export CCACHE_NOHASHDIR=true
-export CCACHE_CPP2=true
-export CCACHE_SLOPPINESS=modules,include_file_mtime,include_file_ctime,time_macros,pch_defines,file_stat_matches,clang_index_store,system_headers,locale
-export CCACHE_DIR=/var/tmp/ccache
-export CCACHE_BASEDIR=/builddir/build/BUILD
-#export CCACHE_LOGFILE=/var/tmp/ccache/cache.debug
-#export CCACHE_DEBUG=true
-#export CCACHE_NODIRECT=true
-#
-export CFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
-export CXXFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -fvisibility-inlines-hidden -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
-export LDFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
-export AR=gcc-ar
-export RANLIB=gcc-ranlib
-export NM=gcc-nm
-unset LD_LIBRARY_PATH
-export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
-export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
-export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
-## altflags1_32 end
-meson --libdir=lib32 --prefix=/usr --buildtype=plain -Ddefault_library=both -Dplatforms=x11,wayland \
--Dgallium=enabled \
--Ddri3=true \
--Ddri-drivers=nouveau \
--Dgallium-drivers=nouveau,i915,virgl,swrast,iris \
--Dprefer-iris=true \
--Dcpp_std=gnu++14 \
--Dgallium-va=true \
--Dgallium-xa=true \
--Dgallium-opencl=icd \
--Dvulkan-drivers=intel \
--Dshared-glapi=enabled \
--Dglvnd=false \
--Dasm=true \
--Dllvm=true \
--Dshared-llvm=disabled \
--Dselinux=false \
--Dprefer-iris=true \
--Dosmesa=true -Dasm=false \
--Dgallium-opencl=disabled \
--Dgallium=enabled builddir
-ninja --verbose %{?_smp_mflags} -v -C builddir
-popd
 
 %install
-pushd ../build32/
-DESTDIR=%{buildroot} ninja -C builddir install
-if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
-then
-pushd %{buildroot}/usr/lib32/pkgconfig
-for i in *.pc ; do ln -s $i 32$i ; done
-popd
-fi
-popd
 DESTDIR=%{buildroot} ninja -C builddir install
 ## install_append content
 #mv %{buildroot}/usr/lib64/haswell/dri/i965_dri.so %{buildroot}/usr/lib64/dri/i965_dri.so.avx2
@@ -343,7 +265,6 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 /usr/include/GLES3/gl3platform.h
 /usr/include/KHR/khrplatform.h
 /usr/include/gbm.h
-/usr/include/vulkan/vulkan_intel.h
 /usr/include/xa_composite.h
 /usr/include/xa_context.h
 /usr/include/xa_tracker.h
@@ -355,25 +276,6 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 /usr/lib64/pkgconfig/glesv2.pc
 /usr/lib64/pkgconfig/osmesa.pc
 /usr/lib64/pkgconfig/xatracker.pc
-
-%files dev32
-%defattr(-,root,root,-)
-/usr/lib32/pkgconfig/32dri.pc
-/usr/lib32/pkgconfig/32egl.pc
-/usr/lib32/pkgconfig/32gbm.pc
-/usr/lib32/pkgconfig/32gl.pc
-/usr/lib32/pkgconfig/32glesv1_cm.pc
-/usr/lib32/pkgconfig/32glesv2.pc
-/usr/lib32/pkgconfig/32osmesa.pc
-/usr/lib32/pkgconfig/32xatracker.pc
-/usr/lib32/pkgconfig/dri.pc
-/usr/lib32/pkgconfig/egl.pc
-/usr/lib32/pkgconfig/gbm.pc
-/usr/lib32/pkgconfig/gl.pc
-/usr/lib32/pkgconfig/glesv1_cm.pc
-/usr/lib32/pkgconfig/glesv2.pc
-/usr/lib32/pkgconfig/osmesa.pc
-/usr/lib32/pkgconfig/xatracker.pc
 
 %files lib
 %defattr(-,root,root,-)
@@ -425,47 +327,3 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 /usr/lib64/vdpau/libvdpau_nouveau.so.1
 /usr/lib64/vdpau/libvdpau_nouveau.so.1.0
 /usr/lib64/vdpau/libvdpau_nouveau.so.1.0.0
-
-%files lib32
-%defattr(-,root,root,-)
-/usr/lib32/dri/i915_dri.so
-/usr/lib32/dri/iris_dri.so
-/usr/lib32/dri/kms_swrast_dri.so
-/usr/lib32/dri/nouveau_dri.so
-/usr/lib32/dri/nouveau_drv_video.so
-/usr/lib32/dri/nouveau_vieux_dri.so
-/usr/lib32/dri/swrast_dri.so
-/usr/lib32/dri/virtio_gpu_dri.so
-/usr/lib32/libEGL.so
-/usr/lib32/libEGL.so.1
-/usr/lib32/libEGL.so.1.0.0
-/usr/lib32/libGL.so
-/usr/lib32/libGL.so.1
-/usr/lib32/libGL.so.1.2.0
-/usr/lib32/libGLESv1_CM.so
-/usr/lib32/libGLESv1_CM.so.1
-/usr/lib32/libGLESv1_CM.so.1.1.0
-/usr/lib32/libGLESv2.so
-/usr/lib32/libGLESv2.so.2
-/usr/lib32/libGLESv2.so.2.0.0
-/usr/lib32/libOSMesa.so
-/usr/lib32/libOSMesa.so.8
-/usr/lib32/libOSMesa.so.8.0.0
-/usr/lib32/libXvMCnouveau.so
-/usr/lib32/libXvMCnouveau.so.1
-/usr/lib32/libXvMCnouveau.so.1.0
-/usr/lib32/libXvMCnouveau.so.1.0.0
-/usr/lib32/libgbm.so
-/usr/lib32/libgbm.so.1
-/usr/lib32/libgbm.so.1.0.0
-/usr/lib32/libglapi.so
-/usr/lib32/libglapi.so.0
-/usr/lib32/libglapi.so.0.0.0
-/usr/lib32/libvulkan_intel.so
-/usr/lib32/libxatracker.so
-/usr/lib32/libxatracker.so.2
-/usr/lib32/libxatracker.so.2.5.0
-/usr/lib32/vdpau/libvdpau_nouveau.so
-/usr/lib32/vdpau/libvdpau_nouveau.so.1
-/usr/lib32/vdpau/libvdpau_nouveau.so.1.0
-/usr/lib32/vdpau/libvdpau_nouveau.so.1.0.0

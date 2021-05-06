@@ -1,5 +1,4 @@
 -Dplatforms=x11,wayland
--Dgallium=enabled
 -Ddri3=true
 -Ddri-drivers=nouveau
 -Dgallium-drivers=nouveau,i915,virgl,swrast,iris

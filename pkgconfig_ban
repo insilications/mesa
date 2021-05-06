@@ -1,5 +1,5 @@
 #
-# This file contains pkgconfig build requirements that get picked up but are 
+# This file contains pkgconfig build requirements that get picked up but are
 # undesirable. One name per line, no whitespace.
 #
 wayland-client
@@ -57,4 +57,3 @@ backtrace
 libva
 32nativewindow
 nativewindow
-ncurses
