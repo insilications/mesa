@@ -48,6 +48,9 @@ libxml2-staticdev
 libxml2-staticdev32
 libXv-dev32
 llvm
+llvm_32
+llvm_32-dev32
+llvm_32-staticdev32
 llvm-abi
 llvm-bin
 llvm-data
@@ -63,6 +66,9 @@ ncurses-dev32
 nettle-dev
 nettle-dev32
 ninja
+nvidia
+nvidia-dev
+nvidia-dev32
 python3-dev
 python3-staticdev
 Sphinx
@@ -86,6 +92,3 @@ zlib-staticdev
 zlib-staticdev32
 zstd-dev
 zstd-dev32
-nvidia
-nvidia-dev
-nvidia-dev32

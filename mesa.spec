@@ -4,15 +4,13 @@
 #
 %define keepstatic 1
 Name     : mesa
-Version  : 12.00
+Version  : 21.1
 Release  : 256
-URL      : file:///aot/build/clearlinux/packages/mesa/mesa-skl-fast-clear-v12.00.tar.gz
-Source0  : file:///aot/build/clearlinux/packages/mesa/mesa-skl-fast-clear-v12.00.tar.gz
+URL      : file:///aot/build/clearlinux/packages/mesa/mesa-v21.1.tar.gz
+Source0  : file:///aot/build/clearlinux/packages/mesa/mesa-v21.1.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : GPL-2.0
-Requires: mesa-data = %{version}-%{release}
-Requires: mesa-lib = %{version}-%{release}
 BuildRequires : Mako-python
 BuildRequires : Sphinx
 BuildRequires : Vulkan-Headers-dev
@@ -35,8 +33,10 @@ BuildRequires : expat-dev
 BuildRequires : expat-dev32
 BuildRequires : flex
 BuildRequires : gcc
+BuildRequires : gcc-abi
 BuildRequires : gcc-dev
 BuildRequires : gcc-dev32
+BuildRequires : gcc-doc
 BuildRequires : gcc-libgcc32
 BuildRequires : gcc-libs-math
 BuildRequires : gcc-libstdc++32
@@ -72,10 +72,14 @@ BuildRequires : llvm-abi
 BuildRequires : llvm-bin
 BuildRequires : llvm-data
 BuildRequires : llvm-dev
+BuildRequires : llvm-dev32
 BuildRequires : llvm-lib
 BuildRequires : llvm-libexec
 BuildRequires : llvm-man
 BuildRequires : llvm-staticdev
+BuildRequires : llvm_32
+BuildRequires : llvm_32-dev32
+BuildRequires : llvm_32-staticdev32
 BuildRequires : ncurses
 BuildRequires : ncurses-dev
 BuildRequires : ncurses-dev32
@@ -91,12 +95,10 @@ BuildRequires : pkgconfig(32xext)
 BuildRequires : pkgconfig(32xfixes)
 BuildRequires : pkgconfig(32xshmfence)
 BuildRequires : pkgconfig(dri3proto)
-BuildRequires : pkgconfig(libdrm_intel)
 BuildRequires : pkgconfig(presentproto)
 BuildRequires : pkgconfig(xdamage)
 BuildRequires : pkgconfig(xfixes)
 BuildRequires : pkgconfig(xshmfence)
-BuildRequires : pkgconfig(xvmc)
 BuildRequires : python3-dev
 BuildRequires : python3-staticdev
 BuildRequires : valgrind-dev
@@ -123,41 +125,15 @@ Patch3: 0001-Revert-egl-move-include-of-local-headers-out-of-Khro.patch
 A Vulkan layer to display information about the running application
 using an overlay.
 
-%package data
-Summary: data components for the mesa package.
-Group: Data
-
-%description data
-data components for the mesa package.
-
-
-%package dev
-Summary: dev components for the mesa package.
-Group: Development
-Requires: mesa-lib = %{version}-%{release}
-Requires: mesa-data = %{version}-%{release}
-Provides: mesa-devel = %{version}-%{release}
-Requires: mesa = %{version}-%{release}
-
-%description dev
-dev components for the mesa package.
-
-
-%package lib
-Summary: lib components for the mesa package.
-Group: Libraries
-Requires: mesa-data = %{version}-%{release}
-
-%description lib
-lib components for the mesa package.
-
-
 %prep
 %setup -q -n mesa
 cd %{_builddir}/mesa
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+pushd ..
+cp -a mesa build32
+popd
 
 %build
 unset http_proxy
@@ -165,7 +141,7 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1620271487
+export SOURCE_DATE_EPOCH=1621167442
 unset LD_AS_NEEDED
 export GCC_IGNORE_WERROR=1
 ## altflags1 content
@@ -194,7 +170,7 @@ export CCACHE_BASEDIR=/builddir/build/BUILD
 #export CCACHE_DEBUG=true
 #export CCACHE_NODIRECT=true
 ## altflags1 end
-CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=plain -Ddefault_library=both -Dplatforms=x11,wayland \
+CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --prefix=/usr --buildtype=release -Ddefault_library=both  -Dplatforms=x11,wayland \
 -Ddri3=true \
 -Ddri-drivers=nouveau \
 -Dgallium-drivers=nouveau,i915,virgl,swrast,iris \
@@ -211,10 +187,64 @@ CFLAGS="$CFLAGS" CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" meson --libdir=lib64 --
 -Dshared-llvm=disabled \
 -Dselinux=false \
 -Dprefer-iris=true \
--Dosmesa=true  builddir
+-Dosmesa=true builddir
 ninja --verbose %{?_smp_mflags} -v -C builddir
+pushd ../build32/
+## altflags1_32 content
+unset LD_LIBRARY_PATH
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
+export CCACHE_DISABLE=true
+export PATH="/usr/lib64/ccache/bin:$PATH"
+export CCACHE_NOHASHDIR=true
+export CCACHE_CPP2=true
+export CCACHE_SLOPPINESS=modules,include_file_mtime,include_file_ctime,time_macros,pch_defines,file_stat_matches,clang_index_store,system_headers,locale
+export CCACHE_DIR=/var/tmp/ccache
+export CCACHE_BASEDIR=/builddir/build/BUILD
+#export CCACHE_LOGFILE=/var/tmp/ccache/cache.debug
+#export CCACHE_DEBUG=true
+#export CCACHE_NODIRECT=true
+#
+export CFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
+export CXXFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -fvisibility-inlines-hidden -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
+export LDFLAGS="-O2 -ffat-lto-objects -fuse-linker-plugin -pipe -fPIC -m32 -mstackrealign -march=native -mtune=native"
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+unset LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
+export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
+export ASFLAGS="${ASFLAGS}${ASFLAGS:+ }--32"
+## altflags1_32 end
+meson --libdir=lib32 --prefix=/usr --buildtype=release -Ddefault_library=both  -Dplatforms=x11,wayland \
+-Ddri3=true \
+-Ddri-drivers=nouveau \
+-Dgallium-drivers=nouveau,i915,virgl,swrast,iris \
+-Dprefer-iris=true \
+-Dcpp_std=gnu++14 \
+-Dgallium-va=true \
+-Dgallium-xa=true \
+-Dvulkan-drivers=intel \
+-Dshared-glapi=enabled \
+-Dglvnd=false \
+-Dasm=false \
+-Dllvm=true \
+-Dshared-llvm=disabled \
+-Dselinux=false \
+-Dprefer-iris=true \
+-Dosmesa=true builddir
+ninja --verbose %{?_smp_mflags} -v -C builddir
+popd
 
 %install
+pushd ../build32/
+DESTDIR=%{buildroot} ninja -C builddir install
+if [ -d  %{buildroot}/usr/lib32/pkgconfig ]
+then
+pushd %{buildroot}/usr/lib32/pkgconfig
+for i in *.pc ; do ln -s $i 32$i ; done
+popd
+fi
+popd
 DESTDIR=%{buildroot} ninja -C builddir install
 ## install_append content
 #mv %{buildroot}/usr/lib64/haswell/dri/i965_dri.so %{buildroot}/usr/lib64/dri/i965_dri.so.avx2
@@ -230,100 +260,3 @@ sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json >
 
 %files
 %defattr(-,root,root,-)
-
-%files data
-%defattr(-,root,root,-)
-/usr/share/drirc.d/00-mesa-defaults.conf
-/usr/share/vulkan/icd.d/intel_icd.i686.json
-/usr/share/vulkan/icd.d/intel_icd.x86_64.json
-
-%files dev
-%defattr(-,root,root,-)
-/usr/include/EGL/egl.h
-/usr/include/EGL/eglext.h
-/usr/include/EGL/eglextchromium.h
-/usr/include/EGL/eglmesaext.h
-/usr/include/EGL/eglplatform.h
-/usr/include/GL/gl.h
-/usr/include/GL/glcorearb.h
-/usr/include/GL/glext.h
-/usr/include/GL/glx.h
-/usr/include/GL/glxext.h
-/usr/include/GL/internal/dri_interface.h
-/usr/include/GL/osmesa.h
-/usr/include/GLES/egl.h
-/usr/include/GLES/gl.h
-/usr/include/GLES/glext.h
-/usr/include/GLES/glplatform.h
-/usr/include/GLES2/gl2.h
-/usr/include/GLES2/gl2ext.h
-/usr/include/GLES2/gl2platform.h
-/usr/include/GLES3/gl3.h
-/usr/include/GLES3/gl31.h
-/usr/include/GLES3/gl32.h
-/usr/include/GLES3/gl3ext.h
-/usr/include/GLES3/gl3platform.h
-/usr/include/KHR/khrplatform.h
-/usr/include/gbm.h
-/usr/include/xa_composite.h
-/usr/include/xa_context.h
-/usr/include/xa_tracker.h
-/usr/lib64/pkgconfig/dri.pc
-/usr/lib64/pkgconfig/egl.pc
-/usr/lib64/pkgconfig/gbm.pc
-/usr/lib64/pkgconfig/gl.pc
-/usr/lib64/pkgconfig/glesv1_cm.pc
-/usr/lib64/pkgconfig/glesv2.pc
-/usr/lib64/pkgconfig/osmesa.pc
-/usr/lib64/pkgconfig/xatracker.pc
-
-%files lib
-%defattr(-,root,root,-)
-/usr/lib64/dri/i915_dri.so
-/usr/lib64/dri/iris_dri.so
-/usr/lib64/dri/kms_swrast_dri.so
-/usr/lib64/dri/nouveau_dri.so
-/usr/lib64/dri/nouveau_drv_video.so
-/usr/lib64/dri/nouveau_vieux_dri.so
-/usr/lib64/dri/swrast_dri.so
-/usr/lib64/dri/virtio_gpu_dri.so
-/usr/lib64/gallium-pipe/pipe_i915.so
-/usr/lib64/gallium-pipe/pipe_iris.so
-/usr/lib64/gallium-pipe/pipe_nouveau.so
-/usr/lib64/gallium-pipe/pipe_swrast.so
-/usr/lib64/libEGL.so
-/usr/lib64/libEGL.so.1
-/usr/lib64/libEGL.so.1.0.0
-/usr/lib64/libGL.so
-/usr/lib64/libGL.so.1
-/usr/lib64/libGL.so.1.2.0
-/usr/lib64/libGLESv1_CM.so
-/usr/lib64/libGLESv1_CM.so.1
-/usr/lib64/libGLESv1_CM.so.1.1.0
-/usr/lib64/libGLESv2.so
-/usr/lib64/libGLESv2.so.2
-/usr/lib64/libGLESv2.so.2.0.0
-/usr/lib64/libMesaOpenCL.so
-/usr/lib64/libMesaOpenCL.so.1
-/usr/lib64/libMesaOpenCL.so.1.0.0
-/usr/lib64/libOSMesa.so
-/usr/lib64/libOSMesa.so.8
-/usr/lib64/libOSMesa.so.8.0.0
-/usr/lib64/libXvMCnouveau.so
-/usr/lib64/libXvMCnouveau.so.1
-/usr/lib64/libXvMCnouveau.so.1.0
-/usr/lib64/libXvMCnouveau.so.1.0.0
-/usr/lib64/libgbm.so
-/usr/lib64/libgbm.so.1
-/usr/lib64/libgbm.so.1.0.0
-/usr/lib64/libglapi.so
-/usr/lib64/libglapi.so.0
-/usr/lib64/libglapi.so.0.0.0
-/usr/lib64/libvulkan_intel.so
-/usr/lib64/libxatracker.so
-/usr/lib64/libxatracker.so.2
-/usr/lib64/libxatracker.so.2.5.0
-/usr/lib64/vdpau/libvdpau_nouveau.so
-/usr/lib64/vdpau/libvdpau_nouveau.so.1
-/usr/lib64/vdpau/libvdpau_nouveau.so.1.0
-/usr/lib64/vdpau/libvdpau_nouveau.so.1.0.0
