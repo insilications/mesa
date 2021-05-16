@@ -12,3 +12,7 @@ presentproto
 xdamage
 xfixes
 xshmfence
+32xvmc
+xvmc
+32libdrm_intel
+libdrm_intel

@@ -72,7 +72,6 @@ BuildRequires : llvm-abi
 BuildRequires : llvm-bin
 BuildRequires : llvm-data
 BuildRequires : llvm-dev
-BuildRequires : llvm-dev32
 BuildRequires : llvm-lib
 BuildRequires : llvm-libexec
 BuildRequires : llvm-man
@@ -90,15 +89,19 @@ BuildRequires : nvidia
 BuildRequires : nvidia-dev
 BuildRequires : nvidia-dev32
 BuildRequires : pkgconfig(32dri3proto)
+BuildRequires : pkgconfig(32libdrm_intel)
 BuildRequires : pkgconfig(32xdamage)
 BuildRequires : pkgconfig(32xext)
 BuildRequires : pkgconfig(32xfixes)
 BuildRequires : pkgconfig(32xshmfence)
+BuildRequires : pkgconfig(32xvmc)
 BuildRequires : pkgconfig(dri3proto)
+BuildRequires : pkgconfig(libdrm_intel)
 BuildRequires : pkgconfig(presentproto)
 BuildRequires : pkgconfig(xdamage)
 BuildRequires : pkgconfig(xfixes)
 BuildRequires : pkgconfig(xshmfence)
+BuildRequires : pkgconfig(xvmc)
 BuildRequires : python3-dev
 BuildRequires : python3-staticdev
 BuildRequires : valgrind-dev
@@ -141,7 +144,7 @@ unset https_proxy
 unset no_proxy
 export SSL_CERT_FILE=/var/cache/ca-certs/anchors/ca-certificates.crt
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1621167442
+export SOURCE_DATE_EPOCH=1621167740
 unset LD_AS_NEEDED
 export GCC_IGNORE_WERROR=1
 ## altflags1 content
@@ -247,15 +250,15 @@ fi
 popd
 DESTDIR=%{buildroot} ninja -C builddir install
 ## install_append content
-#mv %{buildroot}/usr/lib64/haswell/dri/i965_dri.so %{buildroot}/usr/lib64/dri/i965_dri.so.avx2
-#mv %{buildroot}/usr/lib64/haswell/dri/swrast_dri.so %{buildroot}/usr/lib64/dri/swrast_dri.so.avx2
-#mv %{buildroot}/usr/lib64/haswell/dri/iris_dri.so %{buildroot}/usr/lib64/dri/iris_dri.so.avx2
-#ln -s i965_dri.so %{buildroot}/usr/lib64/dri/i915_dri.so
+mv %{buildroot}/usr/lib64/haswell/dri/i965_dri.so %{buildroot}/usr/lib64/dri/i965_dri.so.avx2 || :
+mv %{buildroot}/usr/lib64/haswell/dri/swrast_dri.so %{buildroot}/usr/lib64/dri/swrast_dri.so.avx2 || :
+#mv %{buildroot}/usr/lib64/haswell/dri/iris_dri.so %{buildroot}/usr/lib64/dri/iris_dri.so.avx2 || :
+#ln -s i965_dri.so %{buildroot}/usr/lib64/dri/i915_dri.so || :
 
-#rm -rf  %{buildroot}/usr/lib64/haswell
+rm -rf  %{buildroot}/usr/lib64/haswell || :
 
-sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/intel_icd.i686.json
-#sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.i686.json
+sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/intel_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/intel_icd.i686.json || :
+sed 's/lib64/lib32/' %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.x86_64.json > %{buildroot}/usr/share/vulkan/icd.d/radeon_icd.i686.json || :
 ## install_append end
 
 %files

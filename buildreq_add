@@ -29,6 +29,10 @@ glibc-libc32
 glibc-staticdev
 googletest-dev
 libclc-dev
+libdrm-dev
+libdrm-dev32
+libdrm-staticdev
+libdrm-staticdev32
 libedit
 libedit-dev
 libffi-dev
