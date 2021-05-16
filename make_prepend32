@@ -1,0 +1,2 @@
+sd "/usr/lib64" "/usr/lib32" $(fd -uu --glob *.ninja)
+sd "/usr/lib32/libz3.a" "/usr/lib32/libz3.so" $(fd -uu --glob *.ninja)
